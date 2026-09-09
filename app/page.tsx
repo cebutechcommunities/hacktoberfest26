@@ -21,9 +21,6 @@ export default function Home() {
         <section className="hero wrap" aria-labelledby="hero-heading">
           <div className="hero-copy">
             <p className="eyebrow hero-eyebrow">
-              <span className="small-cross" aria-hidden="true">
-                ✳
-              </span>{" "}
               OPEN SOURCE. LOCAL ROOTS. SHARED POSSIBILITIES.
             </p>
             <h1 id="hero-heading">
@@ -324,9 +321,6 @@ export default function Home() {
                 </h2>
               </div>
               <div className="community-note">
-                <span className="note-asterisk" aria-hidden="true">
-                  ✳
-                </span>
                 <p>
                   Behind every project,
                   <br />

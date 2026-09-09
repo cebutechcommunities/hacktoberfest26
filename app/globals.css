@@ -278,11 +278,6 @@ a:hover .arrow {
   letter-spacing: 0.065em;
   margin-bottom: 20px;
 }
-.small-cross {
-  font-size: 21px;
-  line-height: 1;
-  color: var(--orange-dark);
-}
 .hero h1 {
   font-size: clamp(76px, 7.8vw, 120px);
   letter-spacing: -0.015em;
@@ -1005,11 +1000,6 @@ a:hover .arrow {
   align-items: center;
   gap: 14px;
   margin-bottom: 3px;
-}
-.note-asterisk {
-  color: var(--orange-dark);
-  font-size: 45px;
-  line-height: 1;
 }
 .community-note p {
   font-size: 10px;
