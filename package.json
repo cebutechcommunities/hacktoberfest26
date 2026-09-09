@@ -15,7 +15,7 @@
     "pages:prepare": "node scripts/prepare-pages.mjs",
     "pages:build": "npm run build && npm run pages:prepare",
     "pages:dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler pages dev --cwd cloudflare/pages",
-    "pages:deploy": "WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler pages deploy --cwd cloudflare/pages --branch main"
+    "pages:deploy": "CLOUDFLARE_ACCOUNT_ID=5200341b9209d82afe2f09c14bd88a1c WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler pages deploy --cwd cloudflare/pages --branch main"
   },
   "dependencies": {
     "react": "19.2.6",
