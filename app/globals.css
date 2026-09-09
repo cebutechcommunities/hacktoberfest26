@@ -1111,7 +1111,14 @@ a:hover .arrow {
 }
 
 .beyond-section {
-  background: var(--moss);
+  --cebby-purple: #9333ea;
+  --cebby-purple-dark: #7e22ce;
+  --cebby-purple-hover: #581c87;
+  --cebby-lavender: #faf5ff;
+  --cebby-surface: #fafaf9;
+  --cebby-ink: #1f1f1f;
+  --cebby-muted: #4b5563;
+  background: var(--cebby-purple-dark);
   padding-block: 57px;
 }
 .beyond-grid {
@@ -1122,28 +1129,32 @@ a:hover .arrow {
 }
 .beyond-section .eyebrow,
 .beyond-section .section-number {
-  color: #1d291b;
+  color: var(--cebby-lavender);
 }
 .beyond-section h2 {
-  color: var(--paper);
+  color: var(--cebby-surface);
   font-size: clamp(44px, 4.9vw, 70px);
 }
 .beyond-section .beyond-grid > div > p:last-child {
-  color: #15200f;
+  color: var(--cebby-lavender);
   font-size: 12px;
   line-height: 1.7;
   margin-top: 24px;
 }
 .cebby-panel {
   padding: 27px 32px 18px;
-  background: var(--paper);
+  background: var(--cebby-surface);
+  color: var(--cebby-ink);
   min-width: 0;
+}
+.cebby-panel :focus-visible {
+  outline-color: var(--cebby-purple-dark);
 }
 .cebby-tagline {
   font-size: 8px;
   letter-spacing: 0.075em;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--cebby-muted);
 }
 .cebby-wordmark {
   display: flex;
@@ -1154,10 +1165,10 @@ a:hover .arrow {
   font-weight: 600;
   letter-spacing: -0.095em;
   line-height: 1.3;
-  color: #667350;
+  color: var(--cebby-purple);
 }
 .cebby-wordmark > span {
-  color: var(--ink);
+  color: inherit;
   font-weight: 400;
   font-size: 0.38em;
   letter-spacing: 0;
@@ -1178,6 +1189,11 @@ a:hover .arrow {
 .cebby-links .text-link {
   font-size: 10px;
   gap: 20px;
+  color: var(--cebby-purple-dark);
+}
+.cebby-wordmark:hover,
+.cebby-links .text-link:hover {
+  color: var(--cebby-purple-hover);
 }
 .cebby-address {
   display: block;
@@ -1185,7 +1201,7 @@ a:hover .arrow {
   font-size: 8px;
   text-align: right;
   letter-spacing: 0.07em;
-  color: var(--muted);
+  color: var(--cebby-muted);
 }
 
 .faq-section {
