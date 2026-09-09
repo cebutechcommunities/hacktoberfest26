@@ -21,14 +21,14 @@ The user agreed to Open Assembly and requested a high-fidelity visual mockup bef
 
 The page uses warm ivory, near-black, vivid orange, and selective moss green. Large condensed type anchors an assembled hero with archive photography and an open-door graphic. Quieter editorial sections explain the celebration, introduce Cebu's history, and help newcomers find a place. The dark date section gives the four gatherings clear emphasis. A distinct Cebby section creates a route to continued participation.
 
-Working headline: “Made in Cebu. Open to everyone.”
+Working headline: “Learn. Build. Find your people.”
 
 ## Confirmed and unconfirmed content
 
 User-provided dates: October 3, 10, 18, and 25, 2026.
 Calendar weekdays: Saturday, Saturday, Sunday, Sunday.
 
-Session titles, venues, times, registration details, fees, speakers, sponsors, and specific event formats remain unconfirmed. The mockup labels session details and venues as to be announced.
+The four gathering titles and summaries are announced in `lib/content.ts`: Opening Ceremony; Meetup: Open Source AI Models & Harnesses; Meetup: Deployment Day; Awarding Ceremony & VIP Dinner. Venues, times, registration details, fees, speakers, and sponsors remain unconfirmed. Calendar entries remain date holds, not reservations.
 
 The global 2026 program emphasizes shared learning and open-source AI rather than PR counting. Cebu continues the broader spirit of open source. Do not promise PR rewards or invent local competition rules.
 
@@ -36,13 +36,15 @@ The global 2026 program emphasizes shared learning and open-source AI rather tha
 
 ## Homepage shape
 
-1. Event identity, invitation, and date navigation.
-2. Plain-language introduction to Hacktoberfest and the 2026 change.
-3. Cebu's history through documented people and projects.
-4. The four October dates with truthful program status.
-5. Participation for different skills and levels of experience.
-6. Continued involvement through Cebby's events and calendar.
-7. First-timer questions and a concise footer.
+Value-first October leads: newcomers, especially people new to Cebu, should understand what they can learn, do, and find across the month before exploring the archive.
+
+1. Hero: October invitation, concrete learning and community payoff, and date navigation.
+2. This October / 2026: the four announced gatherings, calendar links, and truthful logistics status.
+3. Find your people: come curious, make something, pass it on — how to show up throughout October.
+4. The idea: a short introduction to Hacktoberfest and the 2026 open-source AI context.
+5. Built here: 2025 projects, awards, and credits, followed by community-in-motion archive proof.
+6. Beyond October: continued involvement through Cebby's events and calendar.
+7. FAQ: first-timer questions, followed by a concise footer.
 
 Before October, prioritize preparation and joining. During October, prioritize the next gathering and updates. After October, prioritize the archive, resources, projects, and continued community participation.
 

@@ -28,9 +28,9 @@ export function Header({ archive = false }: { archive?: boolean }) {
         </span>
       </Link>
       <nav className="desktop-nav" aria-label="Main navigation">
-        <a href={`${base}#story`}>The story</a>
         <a href={`${base}#october`}>This October</a>
-        <a href={`${base}#community`}>The community</a>
+        <a href={`${base}#participate`}>Find your people</a>
+        <a href={`${base}#story`}>The story</a>
       </nav>
       <a className="button header-cta" href={`${base}#october`}>
         Save the dates <Arrow />
@@ -41,8 +41,9 @@ export function Header({ archive = false }: { archive?: boolean }) {
           <span aria-hidden="true">＋</span>
         </summary>
         <nav aria-label="Mobile navigation">
-          <a href={`${base}#story`}>The story</a>
           <a href={`${base}#october`}>This October</a>
+          <a href={`${base}#participate`}>Find your people</a>
+          <a href={`${base}#story`}>The story</a>
           <a href={`${base}#community`}>The community</a>
           <Link href="/2025">2025 archive</Link>
         </nav>
