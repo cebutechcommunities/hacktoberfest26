@@ -11,7 +11,11 @@
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "node --test tests/site.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "pages:prepare": "node scripts/prepare-pages.mjs",
+    "pages:build": "npm run build && npm run pages:prepare",
+    "pages:dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler pages dev --cwd cloudflare/pages",
+    "pages:deploy": "WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler pages deploy --cwd cloudflare/pages --branch main"
   },
   "dependencies": {
     "react": "19.2.6",
@@ -27,6 +31,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
     "@vitejs/plugin-rsc": "0.5.26",
+    "esbuild": "0.27.3",
     "eslint": "9.39.4",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",

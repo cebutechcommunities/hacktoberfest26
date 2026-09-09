@@ -43,3 +43,29 @@ The Sites starter uses React/vinext and produces Cloudflare-compatible output. N
 Before pointing the existing event domain at this build, give the old app a permanent archive origin and update its links. No domain cutover is part of this build.
 
 See `BRIEF.md` for the original direction and `IMPLEMENTATION.md` for scope, attribution, and follow-up boundaries. The original concept is in `mockups/`.
+
+## Cloudflare Pages
+
+The Pages configuration is in `cloudflare/pages/wrangler.jsonc`. It is separate from Vite's development Worker configuration and the existing Sites preview.
+
+```sh
+npm run check
+npm run lint
+npm run pages:build
+npm test
+npm run pages:dev
+```
+
+Once Wrangler is authenticated to the configured Cloudflare account, deploy the prepared build:
+
+```sh
+npm run pages:deploy
+```
+
+This is a direct-upload Pages project with production branch `main`. Each update requires building and deploying again; there is no automatic Git deployment. Credentials stay in Wrangler's local login or the `CLOUDFLARE_API_TOKEN` environment variable, never in the build or repository.
+
+`scripts/prepare-pages.mjs` packages the built application into `dist/pages`: public assets at the root and a bundled server in Pages' `_worker.js`. Pages Functions serve the app routes, event API, and calendar downloads. `_routes.json` lets static assets bypass Functions. No database or other service binding is needed.
+
+Bundling the complete server first preserves Vite's references between its server and SSR modules. Pages uses the same compatibility date as the existing vinext build. The preparation script also creates a local Pages configuration pointer so Wrangler does not pick up Vite's separate Worker deployment configuration.
+
+References: [Pages advanced mode](https://developers.cloudflare.com/pages/functions/advanced-mode/), [direct upload](https://developers.cloudflare.com/pages/get-started/direct-upload/), and [Function routing](https://developers.cloudflare.com/pages/functions/routing/).

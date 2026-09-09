@@ -1,0 +1,9 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "hacktoberfest-cebu-2026",
+  "account_id": "5200341b9209d82afe2f09c14bd88a1c",
+  "pages_build_output_dir": "../../dist/pages",
+  // Match the compatibility date emitted by the existing vinext build.
+  "compatibility_date": "2026-05-15",
+  "compatibility_flags": ["nodejs_compat"],
+}
