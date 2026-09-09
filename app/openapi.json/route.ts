@@ -1,9 +1,11 @@
 const eventSchema = {
   type: "object",
-  required: ["id", "date", "timezone", "registrationStatus"],
+  required: ["id", "date", "title", "summary", "timezone", "registrationStatus"],
   properties: {
     id: { type: "string" },
     name: { type: "string" },
+    title: { type: "string", description: "The gathering’s announced program title." },
+    summary: { type: "string", description: "A short description of the announced activities." },
     edition: { type: "integer" },
     date: { type: "string", format: "date" },
     timezone: { type: "string", const: "Asia/Manila" },
@@ -20,19 +22,19 @@ export function GET() {
       openapi: "3.1.0",
       info: {
         title: "Hacktoberfest Cebu public events",
-        version: "1.0.0",
+        version: "1.1.0",
         description:
-          "Public event dates. This read-only API does not accept registrations or expose attendee data.",
+          "Public event dates and activities. This read-only API does not accept registrations or expose attendee data.",
       },
       paths: {
         "/api/v1/events": {
           get: {
             operationId: "listEvents",
-            summary: "List the announced 2026 Cebu gathering dates",
+            summary: "List the announced 2026 Cebu gathering dates and activities",
             responses: {
               "200": {
                 description:
-                  "Event dates with explicit registration, venue, and time status",
+                  "Event dates, program titles, and summaries with explicit registration, venue, and time status",
                 content: {
                   "application/json": {
                     schema: {

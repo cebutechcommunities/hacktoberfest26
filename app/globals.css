@@ -852,6 +852,8 @@ a:hover .arrow {
   border-block: 1px solid #646754;
 }
 .gathering {
+  display: flex;
+  flex-direction: column;
   padding: 21px 26px 23px;
   border-left: 1px solid #646754;
   scroll-margin-top: 25px;
@@ -896,10 +898,24 @@ a:hover .arrow {
   color: #babdab;
   font-weight: 400;
 }
-.gathering > p {
-  font-size: 10px;
+.gathering h3 {
+  margin-top: 20px;
+  font-family: var(--display);
+  font-size: clamp(24px, 2.2vw, 32px);
+  line-height: 1.15;
+  color: var(--paper);
+}
+.gathering-summary {
+  flex-grow: 1;
+  font-size: 13px;
+  line-height: 1.65;
   color: #bdc1b1;
-  margin-top: 16px;
+  margin-top: 12px;
+}
+.gathering-details {
+  font-size: 11px;
+  color: #bdc1b1;
+  margin-top: 20px;
 }
 .calendar-link {
   display: flex;
@@ -1543,9 +1559,6 @@ summary::-webkit-details-marker {
   .gathering {
     padding-inline: 18px;
   }
-  .gathering > p {
-    font-size: 9px;
-  }
   .gathering .date-weekday {
     font-size: 12px;
   }
@@ -1717,10 +1730,6 @@ summary::-webkit-details-marker {
   }
   .date-weekday > span {
     display: block;
-  }
-  .gathering > p {
-    font-size: 9px;
-    max-width: 105px;
   }
   .calendar-link {
     font-size: 10px;
@@ -2197,11 +2206,6 @@ summary::-webkit-details-marker {
   }
   .date-weekday > span {
     display: inline;
-  }
-  .gathering > p {
-    margin-top: 12px;
-    font-size: 9px;
-    max-width: none;
   }
   .calendar-link {
     margin-top: 12px;

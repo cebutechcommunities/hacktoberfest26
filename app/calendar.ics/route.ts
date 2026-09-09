@@ -1,5 +1,33 @@
 import { gatherings } from "@/lib/content";
 
+function calendarText(value: string) {
+  return value
+    .replaceAll("\\", "\\\\")
+    .replace(/\r\n|\r|\n/g, "\\n")
+    .replaceAll(",", "\\,")
+    .replaceAll(";", "\\;");
+}
+
+// Calendar clients expect lines of at most 75 UTF-8 bytes, including continuation spaces.
+function foldCalendarLine(line: string) {
+  const encoder = new TextEncoder();
+  const lines: string[] = [];
+  let current = "";
+  let bytes = 0;
+  for (const character of line) {
+    const size = encoder.encode(character).length;
+    if (bytes + size > 75) {
+      lines.push(current);
+      current = " ";
+      bytes = 1;
+    }
+    current += character;
+    bytes += size;
+  }
+  lines.push(current);
+  return lines.join("\r\n");
+}
+
 export function GET(request: Request) {
   const date = new URL(request.url).searchParams.get("date");
   const events =
@@ -21,16 +49,15 @@ export function GET(request: Request) {
       "DTSTAMP:20260909T000000Z",
       `DTSTART;VALUE=DATE:${event.date.replaceAll("-", "")}`,
       `DTEND;VALUE=DATE:${event.endDate.replaceAll("-", "")}`,
-      "SUMMARY:Hacktoberfest Cebu 2026 - save the date",
-      "DESCRIPTION:Tentative date hold. Time and venue to be announced.\\n",
-      " Saving this date does not reserve a place.",
+      `SUMMARY:${calendarText(`${event.name} — ${event.title}`)}`,
+      `DESCRIPTION:${calendarText(`${event.summary}\n\nTentative date hold. Time, venue, and registration to be announced. Saving this date does not reserve a place.`)}`,
       "STATUS:TENTATIVE",
       "TRANSP:TRANSPARENT",
       "END:VEVENT",
     ]),
     "END:VCALENDAR",
     "",
-  ].join("\r\n");
+  ].map(foldCalendarLine).join("\r\n");
   return new Response(calendar, {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",

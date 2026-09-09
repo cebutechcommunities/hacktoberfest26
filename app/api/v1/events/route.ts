@@ -5,7 +5,7 @@ export function GET() {
       data: gatherings,
       updatedAt: "2026-09-09",
       notice:
-        "Dates are announced. Times, venues, and registration are not yet announced.",
+        "Dates and activities are announced. Times, venues, and registration are not yet announced.",
     },
     {
       headers: {

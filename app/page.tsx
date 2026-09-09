@@ -208,7 +208,7 @@ export default function Home() {
                 </p>
                 <span className="status-label">
                   <span className="status-dot" aria-hidden="true" />
-                  PROGRAM COMING SOON
+                  ACTIVITIES ANNOUNCED · VENUES SOON
                 </span>
               </div>
             </div>
@@ -229,7 +229,9 @@ export default function Home() {
                       {event.weekday} <span>· October</span>
                     </span>
                   </time>
-                  <p>Details & venue to be announced</p>
+                  <h3>{event.title}</h3>
+                  <p className="gathering-summary">{event.summary}</p>
+                  <p className="gathering-details">Venue &amp; time TBA</p>
                   <a
                     className="calendar-link"
                     href={`/calendar.ics?date=${event.date}`}
@@ -242,8 +244,8 @@ export default function Home() {
             </div>
             <div className="schedule-bottom">
               <p>
-                Registration isn’t open yet. Save a date and check back for the
-                details.
+                Registration isn’t open yet. Save a date and check back for
+                venues and times.
                 <br />
                 <span>Calendar entries are date holds, not reservations.</span>
               </p>

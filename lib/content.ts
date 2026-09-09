@@ -8,6 +8,9 @@ export const gatherings = [
     weekday: "Saturday",
     date: "2026-10-03",
     endDate: "2026-10-04",
+    title: "Opening Ceremony",
+    summary:
+      "Opening salvo for the Philippines’ biggest open-source event. Mentoring for Open Source Project Competition joiners, plus talks on why open source matters and how to contribute or create projects.",
   },
   {
     id: "cebu-2026-10-10",
@@ -15,6 +18,9 @@ export const gatherings = [
     weekday: "Saturday",
     date: "2026-10-10",
     endDate: "2026-10-11",
+    title: "Meetup: Open Source AI Models & Harnesses",
+    summary:
+      "Workshops on using and modifying open-source / open-weight AI models and open-source AI harnesses. Also a checkpoint session for project competition participants.",
   },
   {
     id: "cebu-2026-10-18",
@@ -22,6 +28,9 @@ export const gatherings = [
     weekday: "Sunday",
     date: "2026-10-18",
     endDate: "2026-10-19",
+    title: "Meetup: Deployment Day",
+    summary:
+      "Workshops on deploying open-source projects and open-source / open-weight AI models to cloud platforms. Last checkpoint session for participants.",
   },
   {
     id: "cebu-2026-10-25",
@@ -29,6 +38,9 @@ export const gatherings = [
     weekday: "Sunday",
     date: "2026-10-25",
     endDate: "2026-10-26",
+    title: "Awarding Ceremony & VIP Dinner",
+    summary:
+      "Celebration with open-source advocates, community leaders, and builders for the close of the event — awarding and VIP dinner.",
   },
 ].map((event) => ({
   ...event,
@@ -133,7 +145,7 @@ export const questions = [
   {
     question: "Do I need to know how to code?",
     answer:
-      "No. Open source also needs people who design, write, test, ask good questions, and help others get started. Check each gathering’s details when the program is announced for any specific requirements.",
+      "No. Open source also needs people who design, write, test, ask good questions, and help others get started. Check each gathering’s details for specific requirements as they’re confirmed.",
   },
   {
     question: "Can I come on my own?",
@@ -148,7 +160,7 @@ export const questions = [
   {
     question: "Is Hacktoberfest different this year?",
     answer:
-      "The global 2026 program focuses on learning and building with open-source AI and open-weight models. Cebu’s local program is still taking shape. We’ll publish the confirmed activities here.",
+      "The global 2026 program focuses on learning and building with open-source AI and open-weight models. Explore Cebu’s October gatherings above for the announced activities. Venues, times, and registration will follow.",
   },
   {
     question: "What happened to the previous years?",
