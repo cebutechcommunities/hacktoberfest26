@@ -10,10 +10,19 @@ import {
 import { CommunityBoard } from "@/components/community-board";
 import { SupporterCredits } from "@/components/supporter-credits";
 import { gatherings, projects, questions } from "@/lib/content";
+import { siteOrigin, homeStructuredData, serializeStructuredData } from "@/lib/seo";
+
+export const metadata = {
+  alternates: { canonical: `${siteOrigin}/` },
+};
 
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeStructuredData(homeStructuredData) }}
+      />
       <a className="skip-link" href="#main">
         Skip to content
       </a>

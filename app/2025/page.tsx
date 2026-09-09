@@ -9,11 +9,22 @@ import {
 } from "@/components/site-chrome";
 import { projects, archiveUrl } from "@/lib/content";
 import { SupporterCredits } from "@/components/supporter-credits";
+import { siteOrigin, socialMetadata } from "@/lib/seo";
+
+const archiveDescription =
+  "Explore Hacktoberfest Cebu 2025 projects, awards, contributions, and the communities behind them, with links to earlier editions.";
 
 export const metadata: Metadata = {
   title: "The 2025 archive",
-  description:
-    "Real people. Local projects. Explore highlights from Hacktoberfest Cebu 2025 and the work we’re carrying forward.",
+  description: archiveDescription,
+  alternates: { canonical: `${siteOrigin}/2025` },
+  ...socialMetadata(
+    "The 2025 archive | Hacktoberfest Cebu",
+    archiveDescription,
+    "/2025",
+    "/images/2025/barangay-konek-team.jpg",
+    "The Barangay Konek team and organizers at Hacktoberfest Cebu 2025",
+  ),
 };
 
 export default function Archive() {

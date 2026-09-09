@@ -29,11 +29,11 @@ const expectedProgram = [
 ];
 
 const { default: worker } = await import("../dist/server/index.js");
-function request(path, method = "GET") {
+function request(path, method = "GET", host = "localhost") {
   return worker.fetch(
-    new Request(`http://localhost${path}`, {
+    new Request(`http://${host}${path}`, {
       method,
-      headers: { accept: "text/html", host: "localhost" },
+      headers: { accept: "text/html", host },
     }),
     {
       ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) },
@@ -213,4 +213,87 @@ test("OpenAPI is available and unknown pages return 404", async () => {
     assert.ok(eventSchema.required.includes(field));
   }
   assert.equal((await request("/not-a-real-page")).status, 404);
+});
+
+const canonicalOrigin = "https://hf26.cebutechcommunities.org";
+function metaValue(html, name) {
+  return [...html.matchAll(/<meta\b[^>]*>/g)]
+    .find(([tag]) => tag.includes(`name="${name}"`) || tag.includes(`property="${name}"`))?.[0]
+    .match(/content="([^"]*)"/)?.[1];
+}
+
+test("search and social metadata reflect October value and canonical aliases", async () => {
+  for (const host of ["localhost:3000", "127.0.0.1:3000", "preview.pages.dev", "hf26.cebutechcommunities.org", "localhost.example.com"]) {
+    for (const path of ["/", "/2026", "/2025"]) {
+      const html = await (await request(path, "GET", host)).text();
+      const canonical = path === "/2025" ? "/2025" : "/";
+      const links = [...html.matchAll(/<link\b[^>]*rel="canonical"[^>]*>/g)];
+      assert.equal(links.length, 1);
+      const canonicalHref = links[0][0].match(/href="([^"]+)"/)?.[1];
+      assert.equal(new URL(canonicalHref).href, `${canonicalOrigin}${canonical}`);
+      assert.equal(new URL(metaValue(html, "og:url")).href, `${canonicalOrigin}${canonical}`);
+      const title = html.match(/<title>([^<]*)<\/title>/)?.[1];
+      const description = metaValue(html, "description");
+      if (path === "/2025") {
+        assert.equal(title, "The 2025 archive | Hacktoberfest Cebu");
+        assert.match(description, /2025 projects, awards, contributions/);
+      } else {
+        assert.equal(title, "Hacktoberfest Cebu 2026 — Learn, build, find your people");
+        assert.match(description, /Four gatherings in Cebu this October/);
+        assert.match(description, /open-source AI learning, mentoring and checkpoints/);
+        assert.match(description, /Venues, times and registration TBA/);
+      }
+      assert.equal(metaValue(html, "og:title"), title);
+      assert.equal(metaValue(html, "twitter:title"), title);
+      assert.equal(metaValue(html, "og:description"), description);
+      assert.equal(metaValue(html, "twitter:description"), description);
+      const imageOrigin = /^(localhost|127\.0\.0\.1):/.test(host) ? `http://${host}` : canonicalOrigin;
+      const image = path === "/2025" ? "/images/2025/barangay-konek-team.jpg" : "/og.png";
+      assert.equal(metaValue(html, "og:image"), imageOrigin + image);
+      assert.equal(metaValue(html, "twitter:image"), imageOrigin + image);
+      assert.ok(metaValue(html, "og:image:alt"));
+      assert.equal(metaValue(html, "twitter:image:alt"), metaValue(html, "og:image:alt"));
+      assert.doesNotMatch(description, /Made in Cebu|Four October dates/);
+    }
+  }
+});
+
+test("sitemap lists canonical public pages and robots permits crawling", async () => {
+  const sitemap = await request("/sitemap.xml");
+  assert.equal(sitemap.status, 200);
+  assert.match(sitemap.headers.get("Content-Type"), /application\/xml/);
+  const xml = await sitemap.text();
+  assert.match(xml, /<urlset xmlns="http:\/\/www.sitemaps.org\/schemas\/sitemap\/0.9">/);
+  assert.deepEqual([...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]), [canonicalOrigin + "/", canonicalOrigin + "/2025"]);
+  assert.doesNotMatch(xml, /\/2026|\/api\/|calendar\.ics|lastmod/);
+  const robots = await request("/robots.txt");
+  assert.equal(robots.status, 200);
+  assert.match(robots.headers.get("Content-Type"), /text\/plain/);
+  assert.equal(await robots.text(), `User-agent: *\nAllow: /\n\nSitemap: ${canonicalOrigin}/sitemap.xml\n`);
+});
+
+test("homepage JSON-LD uses the announced program without invented logistics", async () => {
+  for (const path of ["/", "/2026"]) {
+    const html = await (await request(path)).text();
+    const scripts = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
+    assert.equal(scripts.length, 1);
+    const data = JSON.parse(scripts[0][1]);
+    assert.equal(data["@context"], "https://schema.org");
+    const graph = data["@graph"];
+    assert.equal(graph.find((node) => node["@type"] === "WebSite").url, canonicalOrigin + "/");
+    assert.equal(graph.find((node) => node["@type"] === "Organization").name, "Cebu Tech Communities");
+    const series = graph.find((node) => node["@type"] === "EventSeries");
+    const events = graph.filter((node) => node["@type"] === "Event");
+    assert.equal(events.length, 4);
+    assert.deepEqual(events.map((event) => ({ date: event.startDate, title: event.name, summary: event.description })), expectedProgram);
+    assert.deepEqual(series.subEvent, events.map((event) => ({ "@id": event["@id"] })));
+    for (const event of events) {
+      assert.equal(event.eventStatus, "https://schema.org/EventScheduled");
+      assert.equal(event.superEvent["@id"], series["@id"]);
+      assert.equal(event.url, `${canonicalOrigin}/#oct-${event.startDate.slice(-2)}`);
+      for (const field of ["location", "offers", "endDate", "startTime", "isAccessibleForFree", "maximumAttendeeCapacity", "performer", "sponsor"])
+        assert.equal(event[field], undefined, field);
+    }
+    assert.doesNotMatch(scripts[0][1], /RegistrationOpen|InStock/);
+  }
 });
