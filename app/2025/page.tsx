@@ -8,6 +8,7 @@ import {
   Arrow,
 } from "@/components/site-chrome";
 import { projects, archiveUrl } from "@/lib/content";
+import { SupporterCredits } from "@/components/supporter-credits";
 
 export const metadata: Metadata = {
   title: "The 2025 archive",
@@ -96,6 +97,9 @@ export default function Archive() {
             </p>
           </div>
         </section>
+        <div className="archive-supporters wrap">
+          <SupporterCredits />
+        </div>
         <section className="archive-thanks">
           <div className="wrap">
             <Eyebrow>IT TAKES A COMMUNITY</Eyebrow>

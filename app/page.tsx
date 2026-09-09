@@ -7,6 +7,7 @@ import {
   Eyebrow,
 } from "@/components/site-chrome";
 import { CommunityBoard } from "@/components/community-board";
+import { SupporterCredits } from "@/components/supporter-credits";
 import { gatherings, projects, questions } from "@/lib/content";
 
 export default function Home() {
@@ -188,18 +189,7 @@ export default function Home() {
               </article>
             ))}
           </div>
-          <div className="archive-credit">
-            <span>From the 2025 celebration, organized by</span>
-            <div>
-              <a href="https://www.jscebu.org/">JavaScript Cebu</a>
-              <span aria-hidden="true">×</span>
-              <a href="https://pizzapy.ph/">PizzaPy Cebu</a>
-              <span aria-hidden="true">×</span>
-              <a href="https://www.facebook.com/ethphilippines">
-                Ethereum Philippines
-              </a>
-            </div>
-          </div>
+          <SupporterCredits />
         </section>
 
         <section className="october-section" id="october">
