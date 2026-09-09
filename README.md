@@ -46,7 +46,11 @@ See `BRIEF.md` for the original direction and `IMPLEMENTATION.md` for scope, att
 
 ## Cloudflare Pages
 
-Live site: https://hacktoberfest-cebu-2026.pages.dev
+Live site: https://hf26.cebutechcommunities.org
+
+The original Pages address also works: https://hacktoberfest-cebu-2026.pages.dev
+
+The custom domain is attached to the `hacktoberfest-cebu-2026` Pages project. Its proxied CNAME record is `hf26` → `hacktoberfest-cebu-2026.pages.dev` in the `cebutechcommunities.org` zone. The separate `hf.cebutechcommunities.org` archive keeps its existing destination.
 
 The Pages configuration is in `cloudflare/pages/wrangler.jsonc`. It is separate from Vite's development Worker configuration and the existing Sites preview.
 
