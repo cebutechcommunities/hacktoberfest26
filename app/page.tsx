@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   Header,
   Footer,
@@ -363,7 +364,16 @@ export default function Home() {
                 href="https://www.getcebby.com/"
                 aria-label="Visit Cebby"
               >
-                cebby<span aria-hidden="true">↗</span>
+                <Image
+                  className="cebby-logo"
+                  src="/images/cebby/logo.svg"
+                  alt="Cebby"
+                  width={886}
+                  height={571}
+                  loading="lazy"
+                  unoptimized
+                />
+                <span aria-hidden="true">↗</span>
               </a>
               <p>Cebu tech events, all year.</p>
               <div className="cebby-links">

@@ -20,6 +20,7 @@ Production build, TypeScript/lint checks, and HTTP checks of pages, links, event
 - Original photographs: https://hf.cebutechcommunities.org/images/winners/2025/{barangay-konek-team,totoo-ba-ito-team,quiz-attack-team}.jpg
 - Global program: https://hacktoberfest.com/ (verified September 9, 2026)
 - Community continuity: https://www.getcebby.com/ and https://www.getcebby.com/calendar/
+- Cebby logo: unmodified SVG from https://www.getcebby.com/logo.svg, stored locally in `public/images/cebby/logo.svg` with its original proportions and purple fill.
 
 Use CSS framing of original images. Do not regenerate or retouch real attendees. Attribute archival content visibly and keep source links.
 
