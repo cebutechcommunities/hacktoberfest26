@@ -1,6 +1,33 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+const expectedProgram = [
+  {
+    date: "2026-10-03",
+    title: "Opening Ceremony",
+    summary:
+      "Opening salvo for the Philippines’ biggest open-source event. Mentoring for Open Source Project Competition joiners, plus talks on why open source matters and how to contribute or create projects.",
+  },
+  {
+    date: "2026-10-10",
+    title: "Meetup: Open Source AI Models & Harnesses",
+    summary:
+      "Workshops on using and modifying open-source / open-weight AI models and open-source AI harnesses. Also a checkpoint session for project competition participants.",
+  },
+  {
+    date: "2026-10-18",
+    title: "Meetup: Deployment Day",
+    summary:
+      "Workshops on deploying open-source projects and open-source / open-weight AI models to cloud platforms. Last checkpoint session for participants.",
+  },
+  {
+    date: "2026-10-25",
+    title: "Awarding Ceremony & VIP Dinner",
+    summary:
+      "Celebration with open-source advocates, community leaders, and builders for the close of the event — awarding and VIP dinner.",
+  },
+];
+
 const { default: worker } = await import("../dist/server/index.js");
 function request(path, method = "GET") {
   return worker.fetch(
@@ -55,6 +82,10 @@ test("event API exposes date holds with no invented times or registration URLs",
     ["2026-10-03", "2026-10-10", "2026-10-18", "2026-10-25"],
   );
   assert.equal(new Set(data.map((event) => event.id)).size, 4);
+  assert.deepEqual(
+    data.map(({ date, title, summary }) => ({ date, title, summary })),
+    expectedProgram,
+  );
   for (const event of data) {
     assert.equal(event.time, null);
     assert.equal(event.venue, null);
@@ -62,6 +93,26 @@ test("event API exposes date holds with no invented times or registration URLs",
     assert.equal(event.registrationStatus, "not_announced");
   }
   assert.equal((await request("/api/v1/events", "POST")).status, 405);
+});
+
+test("gathering cards show the dated program while logistics remain unannounced", async () => {
+  for (const path of ["/", "/2026"]) {
+    const html = await (await request(path)).text();
+    const cards = html.match(
+      /<article\b[^>]*class="gathering"[^>]*>[\s\S]*?<\/article>/g,
+    );
+    assert.equal(cards?.length, 4);
+    for (const [index, event] of expectedProgram.entries()) {
+      const card = cards[index].replaceAll("&amp;", "&");
+      assert.ok(card.includes(`dateTime="${event.date}"`));
+      assert.ok(card.includes(`<h3>${event.title}</h3>`));
+      assert.ok(card.includes(event.summary));
+      assert.ok(card.includes("Venue & time TBA"));
+      assert.ok(card.includes(`/calendar.ics?date=${event.date}`));
+    }
+    assert.match(html, /ACTIVITIES ANNOUNCED/);
+    assert.doesNotMatch(html, /PROGRAM COMING SOON|Details &amp; venue to be announced/);
+  }
 });
 
 test("calendar dates are tentative, stable, all-day holds with exclusive end dates", async () => {
@@ -87,9 +138,31 @@ test("calendar dates are tentative, stable, all-day holds with exclusive end dat
   }
   for (const line of text.split("\r\n"))
     assert.ok(Buffer.byteLength(line) <= 75);
+  const unfolded = text.replace(/\r\n[ \t]/g, "");
+  const blocks = unfolded.match(/BEGIN:VEVENT\r\n[\s\S]*?END:VEVENT/g);
+  for (const [index, event] of expectedProgram.entries()) {
+    const block = blocks[index];
+    const readText = (property) =>
+      block
+        .split("\r\n")
+        .find((line) => line.startsWith(`${property}:`))
+        ?.slice(property.length + 1)
+        .replace(/\\([\\,;nN])/g, (_, escaped) =>
+          /[nN]/.test(escaped) ? "\n" : escaped,
+        );
+    assert.equal(readText("SUMMARY"), `Hacktoberfest Cebu 2026 — ${event.title}`);
+    assert.equal(
+      readText("DESCRIPTION"),
+      `${event.summary}\n\nTentative date hold. Time, venue, and registration to be announced. Saving this date does not reserve a place.`,
+    );
+    assert.doesNotMatch(block, /\r\nLOCATION:|\r\nDTSTART:(?!.*VALUE=DATE)/);
+  }
   const one = await (await request("/calendar.ics?date=2026-10-18")).text();
   assert.equal((one.match(/BEGIN:VEVENT/g) ?? []).length, 1);
   assert.match(one, /UID:cebu-2026-10-18@/);
+  assert.equal(one, text.replace(/BEGIN:VEVENT\r\n[\s\S]*?END:VEVENT\r\n/g, (block) =>
+    block.includes("UID:cebu-2026-10-18@") ? block : "",
+  ));
   assert.equal((await request("/calendar.ics?date=2026-10-99")).status, 404);
   assert.equal((await request("/calendar.ics?date=")).status, 404);
 });
@@ -100,5 +173,11 @@ test("OpenAPI is available and unknown pages return 404", async () => {
   const spec = await response.json();
   assert.equal(spec.openapi, "3.1.0");
   assert.equal(spec.paths["/api/v1/events"].get.operationId, "listEvents");
+  const eventSchema = spec.paths["/api/v1/events"].get.responses["200"]
+    .content["application/json"].schema.properties.data.items;
+  for (const field of ["title", "summary"]) {
+    assert.equal(eventSchema.properties[field]?.type, "string");
+    assert.ok(eventSchema.required.includes(field));
+  }
   assert.equal((await request("/not-a-real-page")).status, 404);
 });
