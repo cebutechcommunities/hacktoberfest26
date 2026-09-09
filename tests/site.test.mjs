@@ -47,7 +47,7 @@ test("public pages render with real archive content and honest registration stat
     const response = await request(path);
     assert.equal(response.status, 200);
     const html = await response.text();
-    assert.match(html, /MADE IN/);
+    assert.match(html, /FOUR GATHERINGS/);
     assert.match(html, /Registration isn’t open yet/);
     assert.match(html, /FROM THE 2025 ARCHIVE/);
     assert.match(html, /property="og:image"/);
@@ -70,6 +70,39 @@ test("public pages render with real archive content and honest registration stat
     assert.ok(html.includes(name), name);
   for (const year of [2020, 2021, 2023, 2024])
     assert.ok(html.includes(`/projects/${year}`));
+});
+
+test("October value leads the homepage and both navigation menus", async () => {
+  for (const path of ["/", "/2026"]) {
+    const html = await (await request(path)).text();
+    const sections = [...html.matchAll(/<section\b[^>]*>[\s\S]*?<\/section>/g)]
+      .map(([section]) => section);
+    assert.deepEqual(
+      sections.map((section) => section.match(/^<section[^>]*class="([^"]+)"/)[1].split(" ")[0]),
+      ["hero", "october-section", "participate-section", "idea-section", "story-section", "community-section", "beyond-section", "faq-section"],
+    );
+    assert.deepEqual(
+      sections.slice(1, 7).map((section) => section.match(/class="section-number">(\d+)/)?.[1]),
+      ["01", "02", "03", "04", "05", "06"],
+    );
+    const hero = sections[0];
+    assert.match(hero, /FOUR GATHERINGS/);
+    assert.match(hero, /open-source AI/);
+    assert.match(hero, /mentoring and checkpoints for the project competition/);
+    assert.match(hero, /New to Cebu\? Start here/);
+    assert.match(hero, /class="button" href="#october"/);
+    for (const label of ["Main navigation", "Mobile navigation"]) {
+      const nav = html.match(new RegExp(`<nav[^>]*aria-label="${label}"[^>]*>([\\s\\S]*?)</nav>`))?.[1];
+      assert.ok(nav, label);
+      assert.deepEqual(
+        [...nav.matchAll(/href="(#[^"]+)"/g)].map((match) => match[1]),
+        label === "Main navigation"
+          ? ["#october", "#participate", "#story"]
+          : ["#october", "#participate", "#story", "#community"],
+      );
+    }
+    assert.doesNotMatch(html, /program is still taking shape|PROGRAM COMING SOON/);
+  }
 });
 
 test("event API exposes date holds with no invented times or registration URLs", async () => {

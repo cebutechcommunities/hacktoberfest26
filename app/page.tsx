@@ -22,19 +22,18 @@ export default function Home() {
         <section className="hero wrap" aria-labelledby="hero-heading">
           <div className="hero-copy">
             <p className="eyebrow hero-eyebrow">
-              OPEN SOURCE. LOCAL ROOTS. SHARED POSSIBILITIES.
+              FOUR GATHERINGS. ONE OCTOBER IN CEBU.
             </p>
             <h1 id="hero-heading">
-              MADE IN <span>CEBU.</span>
+              LEARN. <span>BUILD.</span>
               <br />
-              OPEN TO
+              FIND YOUR
               <br />
-              <span>EVERYONE.</span>
+              <span>PEOPLE.</span>
             </h1>
             <p className="hero-description">
-              Bring your curiosity. Find your people.
-              <br />
-              Build something we can all make better.
+              Learn with open-source AI, get mentoring and checkpoints for the project competition,
+              and meet people to build with. New to Cebu? Start here.
             </p>
             <div className="hero-actions">
               <a className="button" href="#october">
@@ -112,99 +111,21 @@ export default function Home() {
           </div>
         </div>
 
-        <section className="idea-section wrap" id="idea">
-          <div>
-            <Eyebrow number="01">THE IDEA</Eyebrow>
-            <h2>
-              Good things happen
-              <br />
-              in the open<span className="orange">.</span>
-            </h2>
-          </div>
-          <div className="idea-copy">
-            <p>
-              Hacktoberfest brings people together around open source. In Cebu,
-              that means real people, local projects, and the joy of figuring
-              things out together.
-            </p>
-            <p className="muted">
-              The global 2026 program opens a new chapter in open-source AI.
-              We’re bringing our curiosity—and everything this community has
-              built—along with us.
-            </p>
-            <a className="text-link" href="https://hacktoberfest.com/">
-              Meet the global celebration <Arrow />
-            </a>
-          </div>
-        </section>
-
-        <section className="story-section wrap" id="story">
-          <div className="section-heading">
-            <div>
-              <Eyebrow number="02">BUILT HERE. CARRIED FORWARD.</Eyebrow>
-              <h2>
-                We didn’t start this year<span className="orange">.</span>
-              </h2>
-            </div>
-            <Link className="text-link" href="/2025">
-              Explore the archive <Arrow />
-            </Link>
-          </div>
-          <p className="section-intro">
-            The projects, the people, the “we actually built that” moments.
-            <br className="desktop-break" /> Our next chapter starts with
-            everything that came before.
-          </p>
-          <div className="project-gallery">
-            {projects.slice(0, 3).map((project, index) => (
-              <article
-                key={project.slug}
-                className={`project-item project-${index}`}
-              >
-                <a
-                  className="project-image-link"
-                  href={`/2025#${project.slug}`}
-                  aria-label={`Explore ${project.name} from 2025`}
-                >
-                  <ArchivePhoto
-                    file={project.image}
-                    alt={`${project.name} team at the 2025 Hacktoberfest Cebu awards`}
-                  />
-                  <span className="photo-year">CEBU / 2025</span>
-                  <span className="photo-link-arrow" aria-hidden="true">
-                    ↗
-                  </span>
-                </a>
-                <div className="project-caption">
-                  <div>
-                    <span className="project-award">{project.award}</span>
-                    <h3>
-                      <a href={`/2025#${project.slug}`}>{project.name}</a>
-                    </h3>
-                  </div>
-                  <span className="project-index">0{index + 1}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-          <SupporterCredits />
-        </section>
-
         <section className="october-section" id="october">
           <div className="wrap">
             <div className="section-heading">
               <div>
-                <Eyebrow number="03">THIS OCTOBER / 2026</Eyebrow>
+                <Eyebrow number="01">THIS OCTOBER / 2026</Eyebrow>
                 <h2>
-                  Make room for
+                  An October to
                   <br />
-                  <span className="orange">what’s next.</span>
+                  <span className="orange">build on.</span>
                 </h2>
               </div>
               <div className="schedule-intro">
                 <p>
-                  Four dates to come together.
-                  <br />A whole community to build with.
+                  From your first contribution to deployment.
+                  <br />Learn together, then celebrate what you’ve built.
                 </p>
                 <span className="status-label">
                   <span className="status-dot" aria-hidden="true" />
@@ -263,15 +184,15 @@ export default function Home() {
         <section className="participate-section wrap" id="participate">
           <div className="section-heading">
             <div>
-              <Eyebrow number="04">FIND YOUR PEOPLE</Eyebrow>
+              <Eyebrow number="02">FIND YOUR PEOPLE</Eyebrow>
               <h2>
                 You belong in the room<span className="orange">.</span>
               </h2>
             </div>
             <p>
-              First time or familiar face.
+              New to Cebu, or new to open source?
               <br />
-              There’s a place for you here.
+              Come on your own. Get to know people as you learn.
             </p>
           </div>
           <div className="participation-grid">
@@ -279,8 +200,9 @@ export default function Home() {
               <span className="participation-number">01 /</span>
               <h3>Come curious.</h3>
               <p>
-                Bring a question, a half-formed idea, or something you couldn’t
-                get working. That’s a good place to start.
+                Bring a question or something you couldn’t get working.
+                October’s talks and workshops are a chance to explore open-source
+                AI models, harnesses, and how to put them to use.
               </p>
               <a href="#faq" className="text-link">
                 Your first Hacktoberfest <Arrow />
@@ -290,19 +212,21 @@ export default function Home() {
               <span className="participation-number">02 /</span>
               <h3>Make something.</h3>
               <p>
-                Code, design, write, or test. Find a local project and make one
-                thing a little better for the next person.
+                Code, design, write, or test. Learn how to contribute and deploy
+                a project. Joining the project competition? Mentoring and
+                checkpoints give you places to ask questions along the way.
               </p>
               <Link href="/2025#projects" className="text-link">
-                Find a project <Arrow />
+                Explore 2025 projects <Arrow />
               </Link>
             </article>
             <article>
               <span className="participation-number">03 /</span>
               <h3>Pass it on.</h3>
               <p>
-                Share what you learned. Help someone get unstuck. Open source
-                grows when we make room for each other.
+                Share what you learn at each gathering. Help someone get
+                unstuck, compare approaches, and get to know the people building
+                alongside you.
               </p>
               <a
                 href="https://www.getcebby.com/communities/"
@@ -312,6 +236,84 @@ export default function Home() {
               </a>
             </article>
           </div>
+        </section>
+
+        <section className="idea-section wrap" id="idea">
+          <div>
+            <Eyebrow number="03">THE IDEA</Eyebrow>
+            <h2>
+              Good things happen
+              <br />
+              in the open<span className="orange">.</span>
+            </h2>
+          </div>
+          <div className="idea-copy">
+            <p>
+              Hacktoberfest is a month to learn, build, and contribute to open
+              source: projects whose code is available for people to use,
+              improve, and share.
+            </p>
+            <p className="muted">
+              In 2026, the focus includes open-source AI and open-weight models.
+              Cebu’s gatherings turn that into talks, workshops, and time to
+              learn with other people.
+            </p>
+            <a className="text-link" href="https://hacktoberfest.com/">
+              Meet the global celebration <Arrow />
+            </a>
+          </div>
+        </section>
+
+        <section className="story-section wrap" id="story">
+          <div className="section-heading">
+            <div>
+              <Eyebrow number="04">BUILT HERE. CARRIED FORWARD.</Eyebrow>
+              <h2>
+                We didn’t start this year<span className="orange">.</span>
+              </h2>
+            </div>
+            <Link className="text-link" href="/2025">
+              Explore the archive <Arrow />
+            </Link>
+          </div>
+          <p className="section-intro">
+            The projects, the people, the “we actually built that” moments.
+            <br className="desktop-break" /> Our next chapter starts with
+            everything that came before.
+          </p>
+          <div className="project-gallery">
+            {projects.slice(0, 3).map((project, index) => (
+              <article
+                key={project.slug}
+                className={`project-item project-${index}`}
+              >
+                <a
+                  className="project-image-link"
+                  href={`/2025#${project.slug}`}
+                  aria-label={`Explore ${project.name} from 2025`}
+                >
+                  <ArchivePhoto
+                    file={project.image}
+                    alt={`${project.name} team at the 2025 Hacktoberfest Cebu awards`}
+                  />
+                  <span className="photo-year">CEBU / 2025</span>
+                  <span className="photo-link-arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+                <div className="project-caption">
+                  <div>
+                    <span className="project-award">{project.award}</span>
+                    <h3>
+                      <a href={`/2025#${project.slug}`}>{project.name}</a>
+                    </h3>
+                  </div>
+                  <span className="project-index">0{index + 1}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+          <SupporterCredits />
         </section>
 
         <section className="community-section" id="community">
