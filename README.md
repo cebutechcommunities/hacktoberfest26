@@ -46,6 +46,8 @@ See `BRIEF.md` for the original direction and `IMPLEMENTATION.md` for scope, att
 
 ## Cloudflare Pages
 
+Live site: https://hacktoberfest-cebu-2026.pages.dev
+
 The Pages configuration is in `cloudflare/pages/wrangler.jsonc`. It is separate from Vite's development Worker configuration and the existing Sites preview.
 
 ```sh
