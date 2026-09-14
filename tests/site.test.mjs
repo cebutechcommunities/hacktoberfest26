@@ -297,3 +297,13 @@ test("homepage JSON-LD uses the announced program without invented logistics", a
     assert.doesNotMatch(scripts[0][1], /RegistrationOpen|InStock/);
   }
 });
+
+test("join mock starts with email and keeps participation history out of the initial page", async () => {
+  const response = await request('/join');
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /INTERACTIVE MOCK/);
+  assert.match(html, /type="email"/);
+  assert.match(html, /noindex/);
+  assert.doesNotMatch(html, /Your previous chapters/);
+});
