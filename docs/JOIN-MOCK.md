@@ -4,8 +4,8 @@ Review at `/join`. This is a separate, unlinked prototype route; the public home
 
 ## Review paths
 
-- Choose first-time or returning participant, enter a sample email, simulate verification, confirm a name, and complete demo registration.
-- Returning mode shows explicitly illustrative attendance, registration, and project history. Either mode supports a simulated manual history-merge request.
+- Enter an email, simulate verification, confirm a name, and complete demo registration. The mock recognizes returning@example.com (case-insensitive, trimmed) as a sample historical match; other addresses get an inclusive welcome with an alternate-email recovery option. There is no newcomer/returning selector.
+- A matched email shows explicitly illustrative attendance, registration, and project history. Either mode supports a simulated manual history-merge request.
 - Explore October, then bring a new/existing project and create a team; browse/search sample ideas and request to join; or learn first.
 - The participant home shows registration, next gathering, a date-hold download, preparation checklist, and team/request state.
 - Restart clears the mock. Refresh also clears it. No participant details leave the page and no registration, project, merge request, or email is persisted or sent.
