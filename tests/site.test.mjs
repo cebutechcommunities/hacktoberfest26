@@ -28,6 +28,41 @@ const expectedProgram = [
   },
 ];
 
+// Logistics as published on each gathering's Facebook event and MLH page.
+const expectedLogistics = [
+  {
+    time: { start: "09:00", end: "17:00", checkIn: null },
+    timeLabel: "9 AM – 5 PM",
+    venue: { name: "lyf Cebu City", address: "E Capitol Rd" },
+    registrationUrl: null,
+    eventUrl: "https://www.facebook.com/events/1123083846891808/",
+    startsAt: "2026-10-03T09:00:00+08:00",
+    endsAt: "2026-10-03T17:00:00+08:00",
+    utc: ["20261003T010000Z", "20261003T090000Z"],
+  },
+  {
+    time: { start: "09:00", end: "17:00", checkIn: "08:00" },
+    timeLabel: "9 AM – 5 PM",
+    venue: { name: "DOST Region 7 Innovation Hub", address: "S&T Complex, Sudlon, Lahug" },
+    registrationUrl:
+      "https://events.mlh.com/events/14973-hacktoberfest-meetup-cebu-city-x-cebu-tech-communities",
+    eventUrl: "https://www.facebook.com/events/1767145084336466/",
+    startsAt: "2026-10-10T09:00:00+08:00",
+    endsAt: "2026-10-10T17:00:00+08:00",
+    utc: ["20261010T010000Z", "20261010T090000Z"],
+  },
+  { time: null, venue: null, registrationUrl: null, eventUrl: null, startsAt: null, endsAt: null, holdEnds: "2026-10-19T00:00:00+08:00" },
+  { time: null, venue: null, registrationUrl: null, eventUrl: null, startsAt: null, endsAt: null, holdEnds: "2026-10-26T00:00:00+08:00" },
+];
+const hasEnded = (logistics) => Date.now() >= Date.parse(logistics.endsAt ?? logistics.holdEnds);
+function expectedStatus(logistics) {
+  if (hasEnded(logistics)) return { status: "completed", registrationStatus: "closed" };
+  return {
+    status: logistics.venue ? "scheduled" : "date_announced",
+    registrationStatus: logistics.registrationUrl ? "open" : "not_announced",
+  };
+}
+
 const { default: worker } = await import("../dist/server/index.js");
 function request(path, method = "GET", host = "localhost") {
   return worker.fetch(
@@ -48,7 +83,7 @@ test("public pages render with real archive content and honest registration stat
     assert.equal(response.status, 200);
     const html = await response.text();
     assert.match(html, /FOUR GATHERINGS/);
-    assert.match(html, /Registration isn’t open yet/);
+    assert.doesNotMatch(html, /Registration isn’t open yet/);
     assert.match(html, /FROM THE 2025 ARCHIVE/);
     assert.match(html, /property="og:image"/);
     assert.doesNotMatch(
@@ -105,7 +140,7 @@ test("October value leads the homepage and both navigation menus", async () => {
   }
 });
 
-test("event API exposes date holds with no invented times or registration URLs", async () => {
+test("event API lists confirmed logistics and keeps unannounced ones null", async () => {
   const response = await request("/api/v1/events");
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), "*");
@@ -119,16 +154,22 @@ test("event API exposes date holds with no invented times or registration URLs",
     data.map(({ date, title, summary }) => ({ date, title, summary })),
     expectedProgram,
   );
-  for (const event of data) {
-    assert.equal(event.time, null);
-    assert.equal(event.venue, null);
-    assert.equal(event.registrationUrl, null);
-    assert.equal(event.registrationStatus, "not_announced");
+  for (const [index, event] of data.entries()) {
+    const logistics = expectedLogistics[index];
+    assert.deepEqual(event.time, logistics.time, event.date);
+    assert.deepEqual(event.venue, logistics.venue, event.date);
+    assert.equal(event.registrationUrl, logistics.registrationUrl, event.date);
+    assert.equal(event.eventUrl, logistics.eventUrl, event.date);
+    assert.equal(event.startsAt, logistics.startsAt, event.date);
+    assert.equal(event.endsAt, logistics.endsAt, event.date);
+    const { status, registrationStatus } = expectedStatus(logistics);
+    assert.equal(event.status, status, event.date);
+    assert.equal(event.registrationStatus, registrationStatus, event.date);
   }
   assert.equal((await request("/api/v1/events", "POST")).status, 405);
 });
 
-test("gathering cards show the dated program while logistics remain unannounced", async () => {
+test("gathering cards show confirmed logistics, open registration, and TBA otherwise", async () => {
   for (const path of ["/", "/2026"]) {
     const html = await (await request(path)).text();
     const cards = html.match(
@@ -137,44 +178,53 @@ test("gathering cards show the dated program while logistics remain unannounced"
     assert.equal(cards?.length, 4);
     for (const [index, event] of expectedProgram.entries()) {
       const card = cards[index].replaceAll("&amp;", "&");
+      const logistics = expectedLogistics[index];
+      const { status, registrationStatus } = expectedStatus(logistics);
       assert.ok(card.includes(`dateTime="${event.date}"`));
       assert.ok(card.includes(`<h3>${event.title}</h3>`));
       assert.ok(card.includes(event.summary));
-      assert.ok(card.includes("Venue & time TBA"));
-      assert.ok(card.includes(`/calendar.ics?date=${event.date}`));
+      assert.ok(card.includes(`data-status="${status}"`), event.date);
+      if (logistics.venue) {
+        assert.ok(card.includes(logistics.venue.name), event.date);
+        assert.ok(card.includes(logistics.venue.address), event.date);
+        assert.ok(card.includes(logistics.timeLabel), event.date);
+        assert.ok(!card.includes("Venue & time TBA"), event.date);
+      } else {
+        assert.ok(card.includes("Venue & time TBA"), event.date);
+      }
+      assert.equal(card.includes("Check-in from 8 AM"), logistics.time?.checkIn === "08:00", event.date);
+      assert.equal(card.includes(">Register"), registrationStatus === "open", event.date);
+      if (registrationStatus === "open")
+        assert.ok(card.includes(`href="${logistics.registrationUrl}"`), event.date);
+      assert.equal(card.includes(`/calendar.ics?date=${event.date}`), status !== "completed", event.date);
+      if (logistics.eventUrl) assert.ok(card.includes(`href="${logistics.eventUrl}"`), event.date);
     }
-    assert.match(html, /ACTIVITIES ANNOUNCED/);
+    const next = expectedLogistics.findIndex((logistics) => !hasEnded(logistics));
+    const label = html.match(/<span class="status-label">([\s\S]*?)<\/span>\s*<\/div>/)?.[1].replace(/<[^>]+>/g, "");
+    if (next === -1) assert.equal(label, "ALL FOUR GATHERINGS HELD");
+    else
+      assert.equal(
+        label,
+        `NEXT UP · OCT ${expectedProgram[next].date.slice(-2)}${expectedStatus(expectedLogistics[next]).registrationStatus === "open" ? " · REGISTRATION OPEN" : ""}`,
+      );
     assert.doesNotMatch(html, /PROGRAM COMING SOON|Details &amp; venue to be announced/);
   }
 });
 
-test("calendar dates are tentative, stable, all-day holds with exclusive end dates", async () => {
+test("calendar holds unconfirmed dates and times confirmed gatherings in Manila", async () => {
   const response = await request("/calendar.ics");
   assert.equal(response.status, 200);
   assert.match(response.headers.get("Content-Type"), /^text\/calendar/);
   assert.match(response.headers.get("Content-Disposition"), /^attachment/);
   const text = await response.text();
   assert.equal((text.match(/BEGIN:VEVENT/g) ?? []).length, 4);
-  assert.equal((text.match(/STATUS:TENTATIVE/g) ?? []).length, 4);
-  assert.equal((text.match(/TRANSP:TRANSPARENT/g) ?? []).length, 4);
-  for (const [start, end] of [
-    ["03", "04"],
-    ["10", "11"],
-    ["18", "19"],
-    ["25", "26"],
-  ]) {
-    assert.ok(
-      text.includes(
-        `DTSTART;VALUE=DATE:202610${start}\r\nDTEND;VALUE=DATE:202610${end}`,
-      ),
-    );
-  }
   for (const line of text.split("\r\n"))
     assert.ok(Buffer.byteLength(line) <= 75);
   const unfolded = text.replace(/\r\n[ \t]/g, "");
   const blocks = unfolded.match(/BEGIN:VEVENT\r\n[\s\S]*?END:VEVENT/g);
   for (const [index, event] of expectedProgram.entries()) {
     const block = blocks[index];
+    const logistics = expectedLogistics[index];
     const readText = (property) =>
       block
         .split("\r\n")
@@ -184,11 +234,30 @@ test("calendar dates are tentative, stable, all-day holds with exclusive end dat
           /[nN]/.test(escaped) ? "\n" : escaped,
         );
     assert.equal(readText("SUMMARY"), `Hacktoberfest Cebu 2026 — ${event.title}`);
-    assert.equal(
-      readText("DESCRIPTION"),
-      `${event.summary}\n\nTentative date hold. Time, venue, and registration to be announced. Saving this date does not reserve a place.`,
-    );
-    assert.doesNotMatch(block, /\r\nLOCATION:|\r\nDTSTART:(?!.*VALUE=DATE)/);
+    if (logistics.venue) {
+      const [start, end] = logistics.utc;
+      assert.ok(block.includes(`\r\nDTSTART:${start}\r\nDTEND:${end}\r\n`), event.date);
+      assert.equal(readText("LOCATION"), `${logistics.venue.name}, ${logistics.venue.address}, Cebu City`);
+      assert.match(block, /\r\nSTATUS:CONFIRMED\r\n/);
+      assert.match(block, /\r\nTRANSP:OPAQUE\r\n/);
+      // A higher sequence lets calendars that saved the earlier date hold accept the update.
+      assert.match(block, /\r\nSEQUENCE:1\r\n/);
+      const description = readText("DESCRIPTION");
+      assert.ok(description.startsWith(`${event.summary}\n\n`), event.date);
+      assert.equal(description.includes(`Register: ${logistics.registrationUrl}`), Boolean(logistics.registrationUrl), event.date);
+      assert.ok(description.includes(`Event page: ${logistics.eventUrl}`), event.date);
+    } else {
+      const day = event.date.replaceAll("-", "");
+      const nextDay = logistics.holdEnds.slice(0, 10).replaceAll("-", "");
+      assert.ok(block.includes(`DTSTART;VALUE=DATE:${day}\r\nDTEND;VALUE=DATE:${nextDay}`), event.date);
+      assert.equal(
+        readText("DESCRIPTION"),
+        `${event.summary}\n\nTentative date hold. Time, venue, and registration to be announced. Saving this date does not reserve a place.`,
+      );
+      assert.match(block, /\r\nSTATUS:TENTATIVE\r\n/);
+      assert.match(block, /\r\nTRANSP:TRANSPARENT\r\n/);
+      assert.doesNotMatch(block, /\r\nLOCATION:|\r\nDTSTART:/);
+    }
   }
   const one = await (await request("/calendar.ics?date=2026-10-18")).text();
   assert.equal((one.match(/BEGIN:VEVENT/g) ?? []).length, 1);
@@ -212,6 +281,16 @@ test("OpenAPI is available and unknown pages return 404", async () => {
     assert.equal(eventSchema.properties[field]?.type, "string");
     assert.ok(eventSchema.required.includes(field));
   }
+  // Every value the API can emit must be documented, or clients will reject live data.
+  const { data } = await (await request("/api/v1/events")).json();
+  for (const event of data) {
+    assert.ok(eventSchema.properties.status.enum.includes(event.status), event.status);
+    assert.ok(eventSchema.properties.registrationStatus.enum.includes(event.registrationStatus), event.registrationStatus);
+    for (const field of ["time", "venue", "registrationUrl", "eventUrl", "startsAt", "endsAt"])
+      assert.ok(eventSchema.properties[field], field);
+  }
+  assert.deepEqual(eventSchema.properties.status.enum, ["date_announced", "scheduled", "completed"]);
+  assert.deepEqual(eventSchema.properties.registrationStatus.enum, ["not_announced", "open", "closed"]);
   assert.equal((await request("/not-a-real-page")).status, 404);
 });
 
@@ -241,7 +320,7 @@ test("search and social metadata reflect October value and canonical aliases", a
         assert.equal(title, "Hacktoberfest Cebu 2026 — Learn, build, find your people");
         assert.match(description, /Four gatherings in Cebu this October/);
         assert.match(description, /open-source AI learning, mentoring and checkpoints/);
-        assert.match(description, /Venues, times and registration TBA/);
+        assert.doesNotMatch(description, /TBA/);
       }
       assert.equal(metaValue(html, "og:title"), title);
       assert.equal(metaValue(html, "twitter:title"), title);
@@ -272,7 +351,7 @@ test("sitemap lists canonical public pages and robots permits crawling", async (
   assert.equal(await robots.text(), `User-agent: *\nAllow: /\n\nSitemap: ${canonicalOrigin}/sitemap.xml\n`);
 });
 
-test("homepage JSON-LD uses the announced program without invented logistics", async () => {
+test("homepage JSON-LD locates confirmed gatherings without inventing the rest", async () => {
   for (const path of ["/", "/2026"]) {
     const html = await (await request(path)).text();
     const scripts = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
@@ -285,13 +364,34 @@ test("homepage JSON-LD uses the announced program without invented logistics", a
     const series = graph.find((node) => node["@type"] === "EventSeries");
     const events = graph.filter((node) => node["@type"] === "Event");
     assert.equal(events.length, 4);
-    assert.deepEqual(events.map((event) => ({ date: event.startDate, title: event.name, summary: event.description })), expectedProgram);
+    assert.deepEqual(events.map((event) => ({ date: event.startDate.slice(0, 10), title: event.name, summary: event.description })), expectedProgram);
     assert.deepEqual(series.subEvent, events.map((event) => ({ "@id": event["@id"] })));
-    for (const event of events) {
+    for (const [index, event] of events.entries()) {
+      const logistics = expectedLogistics[index];
       assert.equal(event.eventStatus, "https://schema.org/EventScheduled");
       assert.equal(event.superEvent["@id"], series["@id"]);
-      assert.equal(event.url, `${canonicalOrigin}/#oct-${event.startDate.slice(-2)}`);
-      for (const field of ["location", "offers", "endDate", "startTime", "isAccessibleForFree", "maximumAttendeeCapacity", "performer", "sponsor"])
+      assert.equal(event.url, `${canonicalOrigin}/#oct-${expectedProgram[index].date.slice(-2)}`);
+      if (logistics.venue) {
+        assert.equal(event.startDate, logistics.startsAt);
+        assert.equal(event.endDate, logistics.endsAt);
+        assert.equal(event.eventAttendanceMode, "https://schema.org/OfflineEventAttendanceMode");
+        assert.deepEqual(event.location, {
+          "@type": "Place",
+          name: logistics.venue.name,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: logistics.venue.address,
+            addressLocality: "Cebu City",
+            addressRegion: "Cebu",
+            addressCountry: "PH",
+          },
+        });
+      } else {
+        assert.equal(event.startDate, expectedProgram[index].date);
+        for (const field of ["location", "endDate", "eventAttendanceMode"])
+          assert.equal(event[field], undefined, field);
+      }
+      for (const field of ["offers", "startTime", "isAccessibleForFree", "maximumAttendeeCapacity", "performer", "sponsor"])
         assert.equal(event[field], undefined, field);
     }
     assert.doesNotMatch(scripts[0][1], /RegistrationOpen|InStock/);

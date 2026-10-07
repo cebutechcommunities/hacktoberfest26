@@ -1,4 +1,5 @@
 import { gatherings } from "@/lib/content";
+import { formatTime, gatheringTimes } from "@/lib/gathering-state";
 
 function calendarText(value: string) {
   return value
@@ -28,6 +29,46 @@ function foldCalendarLine(line: string) {
   return lines.join("\r\n");
 }
 
+function calendarUtc(isoDateTime: string) {
+  return new Date(isoDateTime).toISOString().replace(/[-:]|\.\d{3}/g, "");
+}
+
+function calendarEvent(event: (typeof gatherings)[number]) {
+  const { startsAt, endsAt } = gatheringTimes(event);
+  const identity = [
+    `UID:${event.id}@hf.cebutechcommunities.org`,
+    "DTSTAMP:20261007T000000Z",
+  ];
+  const summary = `SUMMARY:${calendarText(`${event.name} — ${event.title}`)}`;
+  if (!startsAt || !endsAt || !event.time || !event.venue)
+    return [
+      ...identity,
+      `DTSTART;VALUE=DATE:${event.date.replaceAll("-", "")}`,
+      `DTEND;VALUE=DATE:${event.endDate.replaceAll("-", "")}`,
+      summary,
+      `DESCRIPTION:${calendarText(`${event.summary}\n\nTentative date hold. Time, venue, and registration to be announced. Saving this date does not reserve a place.`)}`,
+      "STATUS:TENTATIVE",
+      "TRANSP:TRANSPARENT",
+    ];
+  const details = [
+    event.time.checkIn && `Check-in from ${formatTime(event.time.checkIn)}.`,
+    event.registrationUrl && `Register: ${event.registrationUrl}`,
+    event.eventUrl && `Event page: ${event.eventUrl}`,
+  ].filter(Boolean);
+  return [
+    ...identity,
+    `DTSTART:${calendarUtc(startsAt)}`,
+    `DTEND:${calendarUtc(endsAt)}`,
+    summary,
+    `LOCATION:${calendarText(`${event.venue.name}, ${event.venue.address}, Cebu City`)}`,
+    `DESCRIPTION:${calendarText(`${event.summary}\n\n${details.join("\n")}`)}`,
+    "STATUS:CONFIRMED",
+    // Raised from the original date hold so calendars that saved it accept the update.
+    "SEQUENCE:1",
+    "TRANSP:OPAQUE",
+  ];
+}
+
 export function GET(request: Request) {
   const date = new URL(request.url).searchParams.get("date");
   const events =
@@ -43,18 +84,7 @@ export function GET(request: Request) {
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "X-WR-CALNAME:Hacktoberfest Cebu 2026",
-    ...events.flatMap((event) => [
-      "BEGIN:VEVENT",
-      `UID:${event.id}@hf.cebutechcommunities.org`,
-      "DTSTAMP:20260909T000000Z",
-      `DTSTART;VALUE=DATE:${event.date.replaceAll("-", "")}`,
-      `DTEND;VALUE=DATE:${event.endDate.replaceAll("-", "")}`,
-      `SUMMARY:${calendarText(`${event.name} — ${event.title}`)}`,
-      `DESCRIPTION:${calendarText(`${event.summary}\n\nTentative date hold. Time, venue, and registration to be announced. Saving this date does not reserve a place.`)}`,
-      "STATUS:TENTATIVE",
-      "TRANSP:TRANSPARENT",
-      "END:VEVENT",
-    ]),
+    ...events.flatMap((event) => ["BEGIN:VEVENT", ...calendarEvent(event), "END:VEVENT"]),
     "END:VCALENDAR",
     "",
   ].map(foldCalendarLine).join("\r\n");

@@ -10,13 +10,25 @@ import {
 import { CommunityBoard } from "@/components/community-board";
 import { SupporterCredits } from "@/components/supporter-credits";
 import { gatherings, projects, questions } from "@/lib/content";
+import { formatTime, formatTimeRange, gatheringState } from "@/lib/gathering-state";
 import { siteOrigin, homeStructuredData, serializeStructuredData } from "@/lib/seo";
 
 export const metadata = {
   alternates: { canonical: `${siteOrigin}/` },
 };
 
+function registerLabel(url: string) {
+  return new URL(url).hostname.endsWith("mlh.com") ? "Register on MLH" : "Register";
+}
+
 export default function Home() {
+  // Pages render per request, so each visit sees gatherings that have ended as held.
+  const now = new Date();
+  const schedule = gatherings.map((event) => ({ ...event, ...gatheringState(event, now) }));
+  const next = schedule.find((event) => event.status !== "completed");
+  const statusLabel = next
+    ? `NEXT UP · OCT ${next.day}${next.registrationStatus === "open" ? " · REGISTRATION OPEN" : ""}`
+    : "ALL FOUR GATHERINGS HELD";
   return (
     <>
       <script
@@ -100,11 +112,12 @@ export default function Home() {
               <br />
               THIS OCTOBER
             </span>
-            {gatherings.map((event) => (
+            {schedule.map((event) => (
               <a
                 key={event.id}
                 href={`#oct-${event.day}`}
-                aria-label={`See October ${event.day} gathering`}
+                data-status={event.status}
+                aria-label={`See October ${event.day} gathering${event.status === "completed" ? " (held)" : ""}`}
               >
                 <span>OCT</span> {event.day}
                 <span className="strip-arrow" aria-hidden="true">
@@ -138,19 +151,22 @@ export default function Home() {
                 </p>
                 <span className="status-label">
                   <span className="status-dot" aria-hidden="true" />
-                  ACTIVITIES ANNOUNCED · VENUES SOON
+                  {statusLabel}
                 </span>
               </div>
             </div>
             <div className="schedule-grid">
-              {gatherings.map((event, index) => (
+              {schedule.map((event, index) => (
                 <article
                   className="gathering"
                   key={event.id}
                   id={`oct-${event.day}`}
+                  data-status={event.status}
                 >
                   <div className="gathering-top">
-                    <span>GATHERING 0{index + 1}</span>
+                    <span>
+                      {`GATHERING 0${index + 1}${event.status === "completed" ? " · HELD" : ""}`}
+                    </span>
                     <span aria-hidden="true">↗</span>
                   </div>
                   <time dateTime={event.date}>
@@ -161,23 +177,46 @@ export default function Home() {
                   </time>
                   <h3>{event.title}</h3>
                   <p className="gathering-summary">{event.summary}</p>
-                  <p className="gathering-details">Venue &amp; time TBA</p>
-                  <a
-                    className="calendar-link"
-                    href={`/calendar.ics?date=${event.date}`}
-                    download={`hacktoberfest-cebu-${event.date}.ics`}
-                  >
-                    Save this date <span aria-hidden="true">↓</span>
-                  </a>
+                  {event.time && event.venue ? (
+                    <p className="gathering-details">
+                      <span>
+                        {formatTimeRange(event.time)}
+                        {event.time.checkIn && ` · Check-in from ${formatTime(event.time.checkIn)}`}
+                      </span>
+                      <span>{`${event.venue.name}, ${event.venue.address}, Cebu City`}</span>
+                    </p>
+                  ) : (
+                    <p className="gathering-details">Venue &amp; time TBA</p>
+                  )}
+                  {event.registrationStatus === "open" && event.registrationUrl && (
+                    <a className="calendar-link register-link" href={event.registrationUrl}>
+                      {registerLabel(event.registrationUrl)} <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                  {event.status !== "completed" && (
+                    <a
+                      className="calendar-link"
+                      href={`/calendar.ics?date=${event.date}`}
+                      download={`hacktoberfest-cebu-${event.date}.ics`}
+                    >
+                      {event.time ? "Add to calendar" : "Save this date"}{" "}
+                      <span aria-hidden="true">↓</span>
+                    </a>
+                  )}
+                  {event.eventUrl && (
+                    <a className="calendar-link" href={event.eventUrl}>
+                      Facebook event <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
                 </article>
               ))}
             </div>
             <div className="schedule-bottom">
               <p>
-                Registration isn’t open yet. Save a date and check back for
-                venues and times.
+                Venues, times, and registration appear on each gathering as
+                they’re confirmed.
                 <br />
-                <span>Calendar entries are date holds, not reservations.</span>
+                <span>Calendar entries don’t reserve a place. Registration does.</span>
               </p>
               <a
                 className="button button-outline"
