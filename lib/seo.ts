@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { gatherings } from "./content";
+import { gatheringTimes } from "./gathering-state";
 
 export const siteOrigin = "https://hf26.cebutechcommunities.org";
 export const homeTitle = "Hacktoberfest Cebu 2026 — Learn, build, find your people";
 export const homeDescription =
-  "Four gatherings in Cebu this October: open-source AI learning, mentoring and checkpoints for the project competition, and people to build with. Venues, times and registration TBA.";
+  "Four gatherings in Cebu this October: open-source AI learning, mentoring and checkpoints for the project competition, and people to build with. See venues, times and how to register.";
 
 export function metadataOrigin(host: string | null) {
   // Local assets stay local; preview and production hosts share one search identity.
@@ -66,17 +67,35 @@ export const homeStructuredData = {
         "@id": `${siteOrigin}/#oct-${event.day}`,
       })),
     },
-    ...gatherings.map((event) => ({
-      "@type": "Event",
-      "@id": `${siteOrigin}/#oct-${event.day}`,
-      name: event.title,
-      description: event.summary,
-      startDate: event.date,
-      // The calendar's exclusive endDate is not an actual event end date.
-      eventStatus: "https://schema.org/EventScheduled",
-      url: `${siteOrigin}/#oct-${event.day}`,
-      superEvent: { "@id": `${siteOrigin}/#october` },
-    })),
+    ...gatherings.map((event) => {
+      const { startsAt, endsAt } = gatheringTimes(event);
+      return {
+        "@type": "Event",
+        "@id": `${siteOrigin}/#oct-${event.day}`,
+        name: event.title,
+        description: event.summary,
+        // The calendar's exclusive endDate is not an actual event end date; only a confirmed end time is.
+        startDate: startsAt ?? event.date,
+        ...(endsAt && { endDate: endsAt }),
+        eventStatus: "https://schema.org/EventScheduled",
+        ...(event.venue && {
+          eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+          location: {
+            "@type": "Place",
+            name: event.venue.name,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: event.venue.address,
+              addressLocality: "Cebu City",
+              addressRegion: "Cebu",
+              addressCountry: "PH",
+            },
+          },
+        }),
+        url: `${siteOrigin}/#oct-${event.day}`,
+        superEvent: { "@id": `${siteOrigin}/#october` },
+      };
+    }),
   ],
 };
 

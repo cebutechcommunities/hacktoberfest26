@@ -1,7 +1,27 @@
+import type { GatheringTime, Venue } from "./gathering-state";
+
 export const currentEdition = 2026;
 export const archiveUrl = "https://hf.cebutechcommunities.org/projects";
 
-export const gatherings = [
+type Logistics = {
+  time: GatheringTime | null;
+  venue: Venue | null;
+  registrationUrl: string | null;
+  eventUrl: string | null;
+};
+type GatheringSource = {
+  id: string;
+  day: string;
+  weekday: string;
+  date: string;
+  endDate: string;
+  title: string;
+  summary: string;
+} & Logistics;
+const unannounced: Logistics = { time: null, venue: null, registrationUrl: null, eventUrl: null };
+
+// Times are local to Asia/Manila. Logistics come from each gathering's Facebook event and MLH page.
+const program: GatheringSource[] = [
   {
     id: "cebu-2026-10-03",
     day: "03",
@@ -11,6 +31,10 @@ export const gatherings = [
     title: "Opening Ceremony",
     summary:
       "Opening salvo for the Philippines’ biggest open-source event. Mentoring for Open Source Project Competition joiners, plus talks on why open source matters and how to contribute or create projects.",
+    time: { start: "09:00", end: "17:00", checkIn: null },
+    venue: { name: "lyf Cebu City", address: "E Capitol Rd" },
+    registrationUrl: null,
+    eventUrl: "https://www.facebook.com/events/1123083846891808/",
   },
   {
     id: "cebu-2026-10-10",
@@ -21,6 +45,11 @@ export const gatherings = [
     title: "Meetup: Open Source AI Models & Harnesses",
     summary:
       "Workshops on using and modifying open-source / open-weight AI models and open-source AI harnesses. Also a checkpoint session for project competition participants.",
+    time: { start: "09:00", end: "17:00", checkIn: "08:00" },
+    venue: { name: "DOST Region 7 Innovation Hub", address: "S&T Complex, Sudlon, Lahug" },
+    registrationUrl:
+      "https://events.mlh.com/events/14973-hacktoberfest-meetup-cebu-city-x-cebu-tech-communities",
+    eventUrl: "https://www.facebook.com/events/1767145084336466/",
   },
   {
     id: "cebu-2026-10-18",
@@ -31,6 +60,7 @@ export const gatherings = [
     title: "Meetup: Deployment Day",
     summary:
       "Workshops on deploying open-source projects and open-source / open-weight AI models to cloud platforms. Last checkpoint session for participants.",
+    ...unannounced,
   },
   {
     id: "cebu-2026-10-25",
@@ -41,17 +71,15 @@ export const gatherings = [
     title: "Awarding Ceremony & VIP Dinner",
     summary:
       "Celebration with open-source advocates, community leaders, and builders for the close of the event — awarding and VIP dinner.",
+    ...unannounced,
   },
-].map((event) => ({
+];
+
+export const gatherings = program.map((event) => ({
   ...event,
   edition: currentEdition,
   name: "Hacktoberfest Cebu 2026",
   timezone: "Asia/Manila",
-  time: null,
-  venue: null,
-  registrationStatus: "not_announced" as const,
-  registrationUrl: null,
-  status: "date_announced" as const,
 }));
 
 export const projects = [
@@ -155,12 +183,12 @@ export const questions = [
   {
     question: "How do I register?",
     answer:
-      "Registration has not been announced yet. You can save the October dates now. Registration links, venues, times, and any fees will appear here once confirmed. Saving a calendar date does not reserve a place.",
+      "Use the Register link on the gathering’s card above. Each link appears once that gathering is confirmed, along with its venue and time. Saving a calendar date does not reserve a place.",
   },
   {
     question: "Is Hacktoberfest different this year?",
     answer:
-      "The global 2026 program focuses on learning and building with open-source AI and open-weight models. Explore Cebu’s October gatherings above for the announced activities. Venues, times, and registration will follow.",
+      "The global 2026 program focuses on learning and building with open-source AI and open-weight models. Explore Cebu’s October gatherings above for the announced activities, plus venues, times, and registration as each one is confirmed.",
   },
   {
     question: "What happened to the previous years?",
