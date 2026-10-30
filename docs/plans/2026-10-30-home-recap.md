@@ -1,27 +1,31 @@
 # Turn the home page into the 2026 recap
 
-Plan for [#5](https://github.com/cebutechcommunities/hacktoberfest26/issues/5). Status: awaiting lead approval and source material. This phase changes documentation only. No 2026 photos, results, gathering accounts or supporter claims have been supplied or filled in.
+Plan for [#5](https://github.com/cebutechcommunities/hacktoberfest26/issues/5). Status: presentation choices approved; build blocked on lead-provided source material. The lead selected **1B, 2A, 3A, 4A** in [the October 30 approval](https://github.com/cebutechcommunities/hacktoberfest26/issues/5#issuecomment-6526129803), then returned the card to Todo. No 2026 photos, results, gathering accounts or supporter claims were supplied with that approval. This checkpoint changes documentation only; the recap is not implemented.
 
 ## Decisions for a lead
 
 1. Which photo set can you provide for publication?
+   **Approved: B — nine original 2026 photos. Source files and credits remain missing.**
    - **A)** Five original 2026 photos: one hero and one from each of the four gatherings (recommended).
    - **B)** Nine original 2026 photos: one hero and two from each gathering.
    For every photo, provide the file or a downloadable original, its placement/date, a factual caption, the photographer's exact visible credit and a source/credit link if available. Confirm permission to publish. Alt text will describe only the supplied photo and caption. No generated or retouched attendees, stock substitutes or reused 2025 photos.
 2. How should the four gathering accounts be presented?
+   **Approved: A — keep the existing titles. All four factual accounts remain missing.**
    - **A)** Keep each existing gathering title with one lead-written sentence about what actually happened (recommended).
    - **B)** Provide a corrected title with that sentence for each gathering.
    Supply all four sentences, keyed to **October 3, 10, 18 and 25, 2026**. Existing titles are Opening Ceremony; Meetup: Open Source AI Models & Harnesses; Meetup: Deployment Day; Awarding Ceremony & VIP Dinner. Planned program text is not evidence of what happened. Do not supply attendance numbers, venues or outcomes unless confirmed and intended for publication.
 3. How should the winning projects be ordered?
+   **Approved: A — official award/presentation order. The complete winner list remains missing.**
    - **A)** In the lead's official award/presentation order (recommended).
    - **B)** Alphabetically by project name, without implying a ranking.
    Supply the complete 2026 winner list: **project name, team name or credited members, exact award name(s), and repository URL for every winner**. Mark the list complete and give its official order for A. No count, award category, team or project is assumed from 2025. Winner photos are not required in addition to the selected photo set.
 4. How should confirmed 2026 supporters be credited?
+   **Approved: A — confirmed roles/tiers in the lead's order. Supporter and thanks records remain missing.**
    - **A)** By their confirmed roles/tiers, in the lead's supplied order (recommended).
    - **B)** In one alphabetical list without tiers.
    Supply the complete 2026 organizer/supporter names, public links, roles/tiers for A, and the exact names or groups to thank. Text credits suffice; no new logo assets are required. The existing 2025 credits cannot establish 2026 involvement.
 
-Reply on #5 with picks such as `1A 2A 3A 4A` **and the requested source material**, then return the card to Todo. Returning it without picks accepts the recommended presentation choices; it does not supply missing facts. Build only when the complete source package is available from a lead (`OWNER`, `MEMBER` or `COLLABORATOR`). If material is missing, record the specific content blocker and hand off without populating a partial or fabricated recap.
+The presentation decisions are settled; approval does not supply missing facts. The required source package is nine credited original photos, four factual gathering accounts, the complete ordered winner list with project/team/award/repository fields, and confirmed supporter/thanks records. Build only when the complete source package is available from a lead (`OWNER`, `MEMBER` or `COLLABORATOR`). If material is missing, record the specific content blocker and hand off without populating a partial or fabricated recap.
 
 ## What changes
 
